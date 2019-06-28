@@ -1,0 +1,24 @@
+{
+  "name": "hermes",
+  "version": "1.0.0",
+  "description": "A lightweight AJAX module",
+  "main": "hermes.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/william-lindner/Hermes.git"
+  },
+  "keywords": [
+    "ajax",
+    "hermes",
+    "async"
+  ],
+  "author": "William Lindner",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/william-lindner/Hermes/issues"
+  },
+  "homepage": "https://github.com/william-lindner/Hermes#readme"
+}
