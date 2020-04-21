@@ -4,6 +4,21 @@
     let xhr;
 
     // --
+    // Response
+    function Response(request) {
+        this.status = request.status;
+        this.response = request.response;
+        this.statusText = request.statusText;
+        this.responseType = request.responseType;
+
+        this.successful = this.status >= 200 && this.status < 300;
+    }
+
+    Response.prototype.json = function () {
+        return (this.response = JSON.parse(this.response));
+    };
+
+    // --
     // Atlantiades messager to the gods
     function Atlantiades(parcel) {
         this._then = [];
@@ -17,27 +32,38 @@
     }
 
     Atlantiades.prototype.herald = function (request) {
-        let payload = request.response;
+        let throws = false,
+            response = new Response(request);
 
-        if (request.status >= 200 && request.status < 300) {
-            let chain = payload;
-
-            this._then.forEach(function (callback) {
-                chain = callback(chain);
-            });
-        } else {
+        try {
+            this.exec(this._then, response);
+        } catch (e) {
             if (!this._catch.length) {
-                throw new Error(request);
+                throws = e;
+            } else {
+                this.exec(this._catch, response);
             }
-
-            this._catch.forEach(function (callback) {
-                callback(request);
-            });
         }
 
-        this._finally.forEach(function (callback) {
-            callback(payload);
+        this.exec(this._finally, response);
+
+        if (throws) {
+            throw new Error(e);
+        }
+    };
+
+    Atlantiades.prototype.exec = function (chain, response) {
+        if (!response.successful) {
+            throw new Error(response);
+        }
+
+        let result = response;
+
+        chain.forEach(function (callback) {
+            result = callback(result);
         });
+
+        return result;
     };
 
     Atlantiades.prototype.then = function (callback) {
@@ -118,7 +144,8 @@ hermes
         },
     })
     .then(function (response) {
-        return "hey";
+        console.log(response.json());
+        return response.json();
     })
     .then(function (response) {
         console.log(response);
