@@ -165,13 +165,28 @@
 
             return new Atlantiades(parcel);
         },
+        put: function (destination, payload = {}) {
+            const parcel = new Parcel("PUT", destination, payload);
+
+            return new Atlantiades(parcel);
+        },
+        patch: function (destination, payload = {}) {
+            const parcel = new Parcel("PATCH", destination, payload);
+
+            return new Atlantiades(parcel);
+        },
+        delete: function (destination, payload = {}) {
+            const parcel = new Parcel("DELETE", destination, payload);
+
+            return new Atlantiades(parcel);
+        },
     };
 
     global.hermes = hermes;
 })(window);
 
 hermes
-    .post("https://jsonplaceholder.typicode.com/posts", {
+    .put("https://jsonplaceholder.typicode.com/posts/1", {
         expect: "json",
         params: {
             userId: 1,
