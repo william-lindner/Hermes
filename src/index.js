@@ -15,6 +15,10 @@
     }
 
     Response.prototype.json = function () {
+        if (typeof this.response === "object") {
+            return this.response;
+        }
+
         return (this.response = JSON.parse(this.response));
     };
 
@@ -41,19 +45,19 @@
             if (!this._catch.length) {
                 throws = e;
             } else {
-                this.exec(this._catch, response);
+                this.exec(this._catch, response, false);
             }
         }
 
-        this.exec(this._finally, response);
+        this.exec(this._finally, response, false);
 
         if (throws) {
             throw new Error(e);
         }
     };
 
-    Atlantiades.prototype.exec = function (chain, response) {
-        if (!response.successful) {
+    Atlantiades.prototype.exec = function (chain, response, check = true) {
+        if (check && !response.successful) {
             throw new Error(response);
         }
 
@@ -89,8 +93,32 @@
     function Parcel(method, destination, message = {}) {
         this.xhr = xhr = xhr || new XMLHttpRequest();
 
-        this.xhr.open(method, this.label(destination, message.params), true);
+        this.xhr.responseType = message.expect || "json";
+
+        this.formally = method !== "GET" ? this.formify(message.params) : null;
+
+        if (method === "GET") {
+            destination = this.label(destination, message.params);
+        } else {
+            this.formally = this.formify(message.params);
+        }
+
+        this.xhr.open(method, destination, true);
     }
+
+    Parcel.prototype.formify = function (params) {
+        if (!params) {
+            return null;
+        }
+
+        const formData = new FormData();
+
+        for (let key in params) {
+            formData.append(key, params[key]);
+        }
+
+        return formData;
+    };
 
     Parcel.prototype.label = function (destination, params) {
         if (!params) {
@@ -119,7 +147,7 @@
     };
 
     Parcel.prototype.send = function () {
-        this.xhr.send();
+        this.xhr.send(this.formally);
 
         return this;
     };
@@ -132,26 +160,29 @@
 
             return new Atlantiades(parcel);
         },
+        post: function (destination, payload = {}) {
+            const parcel = new Parcel("POST", destination, payload);
+
+            return new Atlantiades(parcel);
+        },
     };
 
     global.hermes = hermes;
 })(window);
 
 hermes
-    .get("https://jsonplaceholder.typicode.com/posts", {
+    .post("https://jsonplaceholder.typicode.com/posts", {
+        expect: "json",
         params: {
             userId: 1,
+            body: "Another note!",
         },
-    })
-    .then(function (response) {
-        console.log(response.json());
-        return response.json();
     })
     .then(function (response) {
         console.log(response);
     })
-    .catch(function (request) {
-        console.log(request);
+    .catch(function (response) {
+        console.log(response);
     })
     .finally(function (response) {
         console.log(response);
