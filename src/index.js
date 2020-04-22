@@ -7,7 +7,7 @@
     // Response
     function Response(request) {
         this.status = request.status;
-        this.response = request.response;
+        this.contents = request.response;
         this.statusText = request.statusText;
         this.responseType = request.responseType;
 
@@ -15,7 +15,7 @@
     }
 
     Response.prototype.json = function () {
-        if (typeof this.response === "object") {
+        if (typeof this.response !== "string") {
             return this.response;
         }
 
@@ -95,7 +95,7 @@
 
         this.xhr.responseType = message.expect || "json";
 
-        this.formally = method !== "GET" ? this.formify(message.params) : null;
+        this.formally = null;
 
         if (method === "GET") {
             destination = this.label(destination, message.params);
@@ -184,21 +184,3 @@
 
     global.hermes = hermes;
 })(window);
-
-hermes
-    .put("https://jsonplaceholder.typicode.com/posts/1", {
-        expect: "json",
-        params: {
-            userId: 1,
-            body: "Another note!",
-        },
-    })
-    .then(function (response) {
-        console.log(response);
-    })
-    .catch(function (response) {
-        console.log(response);
-    })
-    .finally(function (response) {
-        console.log(response);
-    });
