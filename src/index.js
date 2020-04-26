@@ -15,15 +15,15 @@
     }
 
     Response.prototype.json = function () {
-        if (typeof this.response !== "string") {
-            return this.response;
+        if (typeof this.contents !== "string") {
+            return this.contents;
         }
 
-        return (this.response = JSON.parse(this.response));
+        return (this.contents = JSON.parse(this.contents));
     };
 
     // --
-    // Atlantiades messager to the gods
+    // Atlantiades messenger to the gods
     function Atlantiades(parcel) {
         this._then = [];
         this._catch = [];
