@@ -23,7 +23,7 @@
     };
 
     // --
-    // Atlantiades messager to the gods
+    // Atlantiades messenger to the gods
     function Atlantiades(parcel) {
         this._then = [];
         this._catch = [];
