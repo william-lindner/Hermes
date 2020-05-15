@@ -27,16 +27,22 @@
                     body: "Another note!",
                 },
             })
-            .then(function (response) {
-                console.log(response);
+            .then(function(response) {
+                console.log('Then', response);
             })
-            .catch(function (response) {
-                console.log(response);
+            .catch(function(response) {
+                console.log('Catch', response);
             })
-            .finally(function (response) {
-                console.log(response);
+            .finally(function(response) {
+                console.log('Finally', response);
             });
 
+        hermes.get("https://jsonplaceholder.typicode.com/todos/1", {
+                expect: "json"
+            })
+            .then(function(response) {
+                console.log('get', response)
+            });
     </script>
 </body>
 

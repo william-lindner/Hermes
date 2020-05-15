@@ -1,13 +1,17 @@
 (function (global) {
     ("use strict");
 
-    let xhr;
+    const dataSrc = {
+        text: "responseText",
+        json: "response",
+        document: "responseXML",
+    };
 
     // --
     // Response
     function Response(request) {
         this.status = request.status;
-        this.contents = request.response;
+        this.contents = request[dataSrc.json];
         this.statusText = request.statusText;
         this.responseType = request.responseType;
 
@@ -15,11 +19,11 @@
     }
 
     Response.prototype.json = function () {
-        if (typeof this.contents !== "string") {
-            return this.contents;
+        if (typeof this.response !== "string") {
+            return this.response;
         }
 
-        return (this.contents = JSON.parse(this.contents));
+        return (this.response = JSON.parse(this.response));
     };
 
     // --
@@ -91,7 +95,7 @@
     // --
     // The package being sent
     function Parcel(method, destination, message = {}) {
-        this.xhr = xhr = xhr || new XMLHttpRequest();
+        this.xhr = new XMLHttpRequest();
 
         this.xhr.responseType = message.expect || "json";
 
@@ -99,6 +103,7 @@
 
         if (method === "GET") {
             destination = this.label(destination, message.params);
+            console.log(destination);
         } else {
             this.formally = this.formify(message.params);
         }
@@ -122,7 +127,7 @@
 
     Parcel.prototype.label = function (destination, params) {
         if (!params) {
-            return;
+            return destination;
         }
 
         let uri = destination + "?";
